@@ -1,0 +1,10 @@
+.git
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.dlt/
+data/warehouse/*.duckdb
+data/warehouse/*.wal
+dbt_project/target/
+dbt_project/logs/

@@ -1,0 +1,50 @@
+id: crypto_batch_elt
+namespace: demo.crypto
+
+description: |
+  Runs the crypto ELT job once a day.
+  First it loads raw CoinGecko data into DuckDB with dlt.
+  Then it runs the dbt models.
+
+labels:
+  project: crypto-batch-elt
+  stack: dlt-dbt-duckdb-kestra
+
+tasks:
+  - id: log_start
+    type: io.kestra.plugin.core.log.Log
+    message: "Starting crypto batch ELT execution {{ execution.id }}"
+
+  - id: run_dlt_pipeline
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - cd /opt/project && python -m pipelines.dlt_pipeline
+    retry:
+      type: constant
+      interval: PT1M
+      maxAttempt: 3
+    timeout: PT20M
+
+  - id: run_dbt_build
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - cd /opt/project && sh ./scripts/run_dbt.sh
+    retry:
+      type: constant
+      interval: PT1M
+      maxAttempt: 3
+    timeout: PT20M
+
+  - id: log_finish
+    type: io.kestra.plugin.core.log.Log
+    message: "Finished crypto batch ELT execution {{ execution.id }}"
+
+triggers:
+  - id: daily_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 2 * * *"
+    timezone: UTC

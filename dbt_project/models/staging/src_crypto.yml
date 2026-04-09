@@ -1,0 +1,60 @@
+version: 2
+
+sources:
+  - name: crypto_raw
+    schema: crypto_raw
+    description: Raw tables loaded by the Python pipeline.
+    tables:
+      - name: raw_coin_markets
+        description: Coin market data from CoinGecko.
+      - name: raw_global_metrics
+        description: Global market data from CoinGecko.
+
+models:
+  - name: stg_coin_markets
+    description: Cleaned coin market rows.
+    columns:
+      - name: market_snapshot_key
+        tests:
+          - not_null
+          - unique
+      - name: asset_id
+        tests:
+          - not_null
+      - name: asset_symbol
+        tests:
+          - not_null
+      - name: snapshot_date
+        tests:
+          - not_null
+  - name: stg_global_metrics
+    description: Cleaned global market row.
+    columns:
+      - name: global_snapshot_key
+        tests:
+          - not_null
+          - unique
+      - name: snapshot_date
+        tests:
+          - not_null
+          - unique
+      - name: total_market_cap_usd
+        tests:
+          - not_null
+  - name: mart_latest_asset_prices
+    description: Latest row for each asset.
+    columns:
+      - name: asset_id
+        tests:
+          - not_null
+          - unique
+      - name: snapshot_date
+        tests:
+          - not_null
+  - name: mart_daily_market_overview
+    description: Daily summary for the tracked assets.
+    columns:
+      - name: summary_key
+        tests:
+          - not_null
+          - unique

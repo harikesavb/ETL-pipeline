@@ -1,0 +1,22 @@
+name: crypto_elt_dbt
+version: 1.0.0
+config-version: 2
+
+profile: crypto_elt
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+target-path: target
+clean-targets:
+  - target
+  - dbt_packages
+  - logs
+
+models:
+  crypto_elt_dbt:
+    staging:
+      +schema: analytics
+      +materialized: view
+    marts:
+      +schema: analytics
+      +materialized: table
